@@ -20,6 +20,7 @@
         foreach($blobs as $blob)
             {
                 echo $blob->getName().": ".$blob->getUrl()."\n";
+                echo "<img src='".$blob->getUrl()."'><br />";
             }
     }
     catch(ServiceException $e){
