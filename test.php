@@ -29,6 +29,21 @@
         $error_message = $e->getMessage();
         echo $code.": ".$error_message."<br />";
     }
-
-
 ?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<script src="./jquery-3.2.1.min.js"></script>
+	<script src="./confirm.js"></script>
+	<script src="./list_sched.js"></script>
+    <link rel="stylesheet" type="text/css" href="./style.css" />  
+</head>
+<body>
+
+<p>てすと</p>
+
+
+</body>
+</html>
