@@ -21,7 +21,7 @@
             {
                 echo $blob->getName().": ".$blob->getUrl()."\n";
             }
-        
+    }
     catch(ServiceException $e){
         // Error codes and messages are here: 
         // http://msdn.microsoft.com/ja-jp/library/windowsazure/dd179439.aspx
