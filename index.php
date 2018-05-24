@@ -62,6 +62,36 @@
 
 		unset($_SESSION['error_data']);
 	}
+    
+    
+    require_once 'vendor\autoload.php';
+
+    use WindowsAzure\Common\ServicesBuilder;
+    use WindowsAzure\Common\ServiceException;
+
+    // Create blob REST proxy.
+    $connectionString = "DefaultEndpointsProtocol=https;AccountName=storagesoracom;AccountKey=fU9GepJPZu7/w3BpZn4O99Bj5AsE7KLfxN4qdZskTljcqxG8FX9DSZRtHo2CTNz3g3QV+52z9aJse/d9ww1ftQ==;EndpointSuffix=core.windows.net";
+    $blobRestProxy = ServicesBuilder::getInstance()->createBlobService($connectionString);
+
+    try {
+        // List blobs.
+        $blob_list = $blobRestProxy->listBlobs("image");
+        $blobs = $blob_list->getBlobs();
+
+        foreach($blobs as $blob)
+        {
+            echo $blob->getName().": ".$blob->getUrl()."<br />";
+            echo "<img src='".$blob->getUrl()."'><br />";
+        }
+    }
+    catch(ServiceException $e){
+        // Handle exception based on error codes and messages.
+        // Error codes and messages are here: 
+        // http://msdn.microsoft.com/en-us/library/windowsazure/dd179439.aspx
+        $code = $e->getCode();
+        $error_message = $e->getMessage();
+        echo $code.": ".$error_message."<br />";
+    }
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
