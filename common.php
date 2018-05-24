@@ -1,7 +1,7 @@
 <?php
-	$db_host = "localhost";
-	$db_user = "switch_techno";
-	$db_passwd = "x2S8VUDz";
+	$db_host = "testdatabase00.mysql.database.azure.com";
+	$db_user = "phpappuser@testdatabase00.mysql.database.azure.com";
+	$db_passwd = "MySQLAzure2017";
 	$db = "switch_techno";
 
 	header('Cache-Control: no-store, no-cache, must-revalidate');
