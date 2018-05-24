@@ -1,0 +1,158 @@
+前提：
+	本番機の社内IPは172.16.1.188。
+	DES-1100-16のIPはデフォルト、本番機側のIPは10.90.90.2/24。
+
+===== switch_technoユーザ追加 =====
+$ ssh pi@172.16.1.188
+pi@172.16.1.188's password: Ch1harada1
+$ sudo su
+# sudo adduser switch_techno
+新しい UNIX パスワードを入力してください: NkP0FO51 CXYUSPbj
+新しい UNIX パスワードを再入力してください: NkP0FO51 CXYUSPbj
+# gpasswd -a switch_techno sudo
+
+===== スイッチ設定 =====
+
+System -> Password Access Control 
+	New Password: 3v7zIRFb
+
+VLAN -> 802.1Q VLAN
+	VID,VLAN Name,Untagged VLAN Ports,Tagged VLAN Ports
+	1,control,01,
+	1007,zensha,,05
+	1008,kiban,,05
+	2002,solution,,05
+	2007,system,,05
+	3023,center,,05
+
+===== LAMPインストール =====
+$ ssh switch_techno@172.16.1.188
+switch_techno@172.16.1.188's password: NkP0FO51
+$ sudo su
+[sudo] password for switch_techno: NkP0FO51
+# apt-get install apache2 php mysql-server
+mysqlのrootのパスワード：J3rAdPpC
+
+===== DB構築 =====
+# mysql -p
+Enter password: J3rAdPpC
+SET sql_mode = '';
+create database switch_techno default CHARACTER SET UTF8;
+CREATE USER switch_techno IDENTIFIED BY '6i6Dh9F4';
+GRANT ALL ON switch_techno.* TO switch_techno;
+exit
+
+$ mysql -p
+Enter password: 6i6Dh9F4
+SET sql_mode = '';
+
+use switch_techno
+drop table vlanstatus;
+drop table schedules;
+drop table network_master;
+drop table room_master;
+
+create table network_master (
+    id int NOT NULL PRIMARY KEY,
+    name varchar(128) NOT NULL,
+    vlan varchar(64) NOT NULL,
+    baseset varchar(64) NOT NULL,
+    cdate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    udate timestamp
+);
+insert into network_master (id, name, vlan, baseset)
+    values (1, '172.16.7 (全社用)', 'zensha', '0000T00000000000');
+insert into network_master (id, name, vlan, baseset)
+    values (2, '172.16.8 (基盤技術部)', 'kiban', '0000T00000000000');
+insert into network_master (id, name, vlan, baseset)
+    values (3, '172.17.2 (ソリューション)', 'solution', '0000T00000000000');
+insert into network_master (id, name, vlan, baseset)
+    values (4, '172.18.23 (センター統括、TV会議)', 'center', '0000T00000000000');
+insert into network_master (id, name, vlan, baseset)
+    values (5, '172.17.7 (システム運用課)', 'system', '0000T00000000000');
+
+create table room_master (
+    id int NOT NULL PRIMARY KEY,
+    name varchar(128) NOT NULL,
+    portno int NOT NULL,
+    cdate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    udate timestamp
+);
+insert into room_master (id, name, portno)
+    values (1, '会議室1', 9);
+insert into room_master (id, name, portno)
+    values (2, '会議室2', 10);
+insert into room_master (id, name, portno)
+    values (3, '応接室1', 11);
+insert into room_master (id, name, portno)
+    values (4, '応接室2', 12);
+
+create table schedules (
+    id int AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    sdate varchar(12) NOT NULL,
+    edate varchar(12) NOT NULL,
+    network_id int NOT NULL,
+    room_id int NOT NULL,
+    static int NOT NULL DEFAULT 0,
+    applicant varchar(128) NOT NULL,
+    purpose varchar(256) NOT NULL,
+    cdate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    udate timestamp,
+    foreign key(network_id) references network_master(id),
+    foreign key(room_id) references room_master(id)
+);
+
+create table vlanstatus (
+    vlan varchar(64) NOT NULL,
+    portno int NOT NULL,
+    cdate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+===== apache設定 =====
+開発機の$HOME/switchの下まるごとコピー　
+
+# vi /etc/apache2/apache2.conf
+<Directory /var/www/>
+#   Options Indexes FollowSymLinks
+    Options FollowSymLinks
+    AllowOverride None
+    Require all granted
+</Directory>
+
+# vi /etc/apache2/conf-enabled/security.conf
+ServerTokens Prod
+ServerSignature Off
+
+# vi /etc/apache2/sites-enabled/000-default.conf
+	<Directory "/var/www/html/switch">
+		AuthType Basic
+		AuthName "Basic Auth"
+		AuthUserFile /home/switch_techno/switch/etc/htpasswd
+		Require valid-user
+	</Directory>
+
+# ln -s /home/switch_techno/switch/php /var/www/html/switch
+
+# apt-get install php7.0-mysql libwww-perl
+
+# vi /etc/php/7.0/apache2/php.ini
+include_path = ".:/home/switch_techno/switch/common"
+
+# service apache2 restart
+
+===== cron設定 =====
+$ crontab -e
+* * * * * /home/switch_techno/switch/cron/chosei.sh
+
+===== スイッチの管理方法 =====
+
+vncserverの起動・停止
+$ sudo raspi-config
+    -> 5 Interfacing Options
+        -> P3 VNC
+            Would you like the VNC Server to be enabled?
+            <はい> or <いいえ>
+vncserverを起動すれば他のPCからvncviewerでラズパイにGUIログインできる。
+
+switch_technoでログインして、crontab -eでperlスクリプトを停止、
+ラズパイでブラウザ起動、http://10.90.90.90/でログインできる。

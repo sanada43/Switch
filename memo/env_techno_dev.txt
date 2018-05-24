@@ -1,0 +1,133 @@
+前提：
+	sudoerアカウントswitch_techno/techno123が存在する。
+	開発機のIPは172.16.1.192。
+
+===== LAMPインストール =====
+$ ssh switch_techno@172.16.1.192
+switch_techno@172.16.1.192's password: techno123
+$ sudo su
+[sudo] password for switch_techno: techno123
+# apt-get install apache2 php mysql-server
+mysqlのrootのパスワード：mysql123
+
+===== DB構築 =====
+# mysql -p
+Enter password: mysql123
+SET sql_mode = '';
+create database switch_techno default CHARACTER SET UTF8;
+CREATE USER switch_techno IDENTIFIED BY 'x2S8VUDz';
+GRANT ALL ON switch_techno.* TO switch_techno;
+exit
+
+$ mysql -p
+Enter password: x2S8VUDz
+SET sql_mode = '';
+
+use switch_techno
+drop table vlanstatus;
+drop table schedules;
+drop table network_master;
+drop table room_master;
+
+create table network_master (
+    id int NOT NULL PRIMARY KEY,
+    name varchar(128) NOT NULL,
+    vlan varchar(64) NOT NULL,
+    baseset varchar(64) NOT NULL,
+    cdate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    udate timestamp
+);
+insert into network_master (id, name, vlan, baseset)
+    values (1, '172.16.7 (全社用)', 'zensha', '000000000000000T');
+insert into network_master (id, name, vlan, baseset)
+    values (2, '172.16.8 (基盤技術部)', 'kiban', '000000000000000T');
+insert into network_master (id, name, vlan, baseset)
+    values (3, '172.17.2 (ソリューション)', 'solution', '000000000000000T');
+insert into network_master (id, name, vlan, baseset)
+    values (4, '172.18.23 (センター統括、TV会議)', 'center', '000000000000000T');
+insert into network_master (id, name, vlan, baseset)
+    values (5, '172.17.7 (システム運用課)', 'system', '000000000000000T');
+
+create table room_master (
+    id int NOT NULL PRIMARY KEY,
+    name varchar(128) NOT NULL,
+    portno int NOT NULL,
+    cdate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    udate timestamp
+);
+insert into room_master (id, name, portno)
+    values (1, '会議室1', 9);
+insert into room_master (id, name, portno)
+    values (2, '会議室2', 10);
+insert into room_master (id, name, portno)
+    values (3, '応接室1', 11);
+insert into room_master (id, name, portno)
+    values (4, '応接室2', 12);
+
+create table schedules (
+    id int AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    sdate varchar(12) NOT NULL,
+    edate varchar(12) NOT NULL,
+    network_id int NOT NULL,
+    room_id int NOT NULL,
+    static int NOT NULL DEFAULT 0,
+    applicant varchar(128) NOT NULL,
+    purpose varchar(256) NOT NULL,
+    cdate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    udate timestamp,
+    foreign key(network_id) references network_master(id),
+    foreign key(room_id) references room_master(id)
+);
+
+create table vlanstatus (
+    vlan varchar(64) NOT NULL,
+    portno int NOT NULL,
+    cdate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+===== apache設定 =====
+$ cd $HOME/switch/etc/
+$ htpasswd -c htpasswd techno
+New password: dMtDzirK
+Re-type new password: dMtDzirK
+Adding password for user techno
+
+# vi /etc/apache2/apache2.conf
+<Directory /var/www/>
+#   Options Indexes FollowSymLinks
+    Options FollowSymLinks
+    AllowOverride None
+    Require all granted
+</Directory>
+
+# vi /etc/apache2/conf-enabled/security.conf
+ServerTokens Prod
+ServerSignature Off
+
+# vi /etc/apache2/sites-enabled/switch_techno.conf
+<VirtualHost *:8080>
+	#ServerName www.example.com
+
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/switch_techno
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log.techno
+	CustomLog ${APACHE_LOG_DIR}/access.log.techno combined
+
+	<Directory "/var/www/switch_techno">
+		AuthType Basic
+		AuthName "Basic Auth"
+		AuthUserFile /home/switch_techno/switch/etc/htpasswd
+		Require valid-user
+	</Directory>
+
+	php_value include_path ".:/home/switch_techno/switch/common"
+
+</VirtualHost>
+
+# mkdir /var/www/switch_techno
+# ln -s /home/switch_techno/switch/php /var/www/switch_techno/switch
+
+# apt-get install php7.0-mysql libwww-perl libapache2-mod-php7.0
+
+# service apache2 restart

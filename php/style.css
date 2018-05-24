@@ -1,0 +1,192 @@
+#input_form {
+	border-collapse: collapse;
+	width: 70%;
+}
+
+/*
+#input_form th.t_top {
+    border-top: #be1309 4px solid;
+}
+*/
+
+#input_form th {
+	border-bottom: #e3e3e3 1px dotted;
+	text-align: left;
+	padding: 10px;
+	font-weight: normal;
+}
+
+/*
+#input_form td.t_top {
+	border-top: #b3b3b3 4px solid;
+}
+*/
+
+#input_form td {
+	border-bottom: #e3e3e3 1px dotted;
+	text-align: left;
+	padding: 10px;
+}
+
+#input_form tr:hover {
+    background: #3D80DF;
+    color: #FFFFFF;
+}
+
+#schedules table {
+	width: 100%;
+	border-collapse: collapse;
+}
+	
+#schedules th {
+	padding: 3px;
+	text-align: left;
+	color: #3366CC;
+	font-weight: bold;
+	border-bottom: 4px solid #3366CC;
+}
+
+#schedules td {
+	padding: 3px;
+	text-align: left;
+	border-bottom: 1px dashed #999999;
+}
+
+#schedules tr.list:hover {
+	background: #CCFFCC;
+}
+
+#schedules tr.nowon {
+	background: #FF99CC;
+}
+
+#histories table {
+	width: 100%;
+	border-collapse: collapse;
+}
+	
+#histories th {
+	padding: 3px;
+	text-align: left;
+	color: #3366CC;
+	font-weight: bold;
+	border-bottom: 4px solid #3366CC;
+}
+
+#histories td {
+	padding: 3px;
+	text-align: left;
+	border-bottom: 1px dashed #999999;
+}
+
+#histories tr.list:hover {
+	background: #CCFFCC;
+}
+
+.hr-text {
+	line-height: 1em;
+	position: relative;
+	outline: 0;
+	border: 0;
+	color: black;
+	text-align: center;
+	height: 1.5em;
+	opacity: .9;
+}
+.hr-text:before {
+	content: '';
+	background: -webkit-linear-gradient(left, transparent, #818078, transparent);
+	background: linear-gradient(to right, transparent, #818078, transparent);
+	position: absolute;
+	left: 0;
+	top: 50%;
+	width: 100%;
+	height: 1px;
+}
+.hr-text:after {
+	content: attr(data-content);
+	position: relative;
+	display: inline-block;
+	color: black;
+	padding: 0 .5em;
+	line-height: 1.5em;
+	color: #818078;
+	background-color: #fcfcfa;
+}
+
+.circletd {
+  text-align: center;
+  vertical-align: middle;
+  width: 100px;
+}
+.circle {
+  color: #000;
+  background-color:#f00;
+  padding: 0;
+  margin: 0;
+  width: 100px;
+  height: 75px;
+/*
+  line-height: 25px;
+*/
+  text-align: center;
+  vertical-align: middle;
+/*
+  display: inline-block;
+*/
+  display: table-cell;
+  border-radius: 50%;
+}
+
+.arrow {
+    position: relative;
+    width: 100px;
+    height: 20px;
+    background: linear-gradient(to right, #ff0, #0f0);
+}
+.arrow::after {
+    content: "";
+    position: absolute;
+    top: -10px;
+    right: -20px;
+    border-left: 20px solid #0f0;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+}
+
+.pager {
+    overflow: hidden;
+}
+ 
+.pager ul {
+    list-style: none;
+    position: relative;
+    left: 50%;
+    float: left;
+}
+ 
+.pager ul li {
+    margin: 0 1px;
+    position: relative;
+    left: -50%;
+    float: left;
+}
+ 
+.pager ul li span,
+.pager ul li a {
+    display: block;
+    font-size: 16px;
+    padding: 0.6em 1em;
+    border-radius: 3px;
+}
+ 
+.pager ul li a {
+    background: #EEE;
+    color: #000;
+    text-decoration: none;
+}
+ 
+.pager ul li a:hover {
+    background: #333;
+    color: #FFF;
+}
