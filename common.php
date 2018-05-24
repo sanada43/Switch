@@ -1,6 +1,6 @@
 <?php
 	$db_host = "testdatabase00.mysql.database.azure.com";
-	$db_user = "phpappuser@testdatabase00.mysql.database.azure.com";
+	$db_user = "phpappuser@testdatabase00";
 	$db_passwd = "MySQLAzure2017";
 	$db = "switch_techno";
 
